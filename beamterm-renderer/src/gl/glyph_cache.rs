@@ -88,8 +88,9 @@ impl GlyphCache {
 
         let cache_key = (CompactString::new(key), style);
         let is_emoji = emojis::get(key).is_some();
+        let double_width = is_emoji || key.width() == 2;
 
-        if is_emoji || key.width() == 2 {
+        if is_double_width(key) {
             // Check if already present
             if let Some(&slot) = self.wide.get(&cache_key) {
                 return (slot, None);
