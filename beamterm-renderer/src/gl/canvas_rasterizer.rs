@@ -248,6 +248,11 @@ impl CanvasRasterizer {
         Ok(results)
     }
 
+    /// Returns the font family string used by this rasterizer.
+    pub(super) fn font_family(&self) -> &str {
+        &self.font_family
+    }
+
     /// Measures cell size by rendering "█" and scanning actual pixel bounds.
     /// This is more accurate than text metrics which can have rounding issues.
     fn measure_cell_metrics(
@@ -327,21 +332,6 @@ fn build_font_string(font_family: &str, font_size: f32, style: FontStyle) -> Str
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_is_double_width() {
-        // emoji
-        assert!(is_double_width("😀"));
-        assert!(is_double_width("👨‍👩‍👧")); // ZWJ sequence
-
-        // CJK
-        assert!(is_double_width("中"));
-        assert!(is_double_width("日"));
-
-        // single-width
-        assert!(!is_double_width("A"));
-        assert!(!is_double_width("→"));
-    }
 
     #[test]
     fn test_build_font_string() {

@@ -2,16 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [beamterm-v0.14.0] - 2026-01-27
+
+### 🚀 Features
+
+- *(renderer)* Add `auto_resize_canvas_css` option to `TerminalBuilder` (#85)
+
+## [beamterm-v0.13.0] - 2026-01-25
 
 ### 🚀 Features
 
 - *(atlas)* Runtime font atlas replacement (#73)
 - *(mouse)* Modifier key requirements for text selection (#74)
+- *(renderer)* Automatic device pixel ratio scaling for HiDPI displays (#83)
+
+### 💼 Other
+
+- *(deps)* Bump serde_json from 1.0.148 to 1.0.149 (#77)
+- *(deps)* Bump lru from 0.16.2 to 0.16.3 (#76)
+- *(deps)* Bump miniz_oxide from 0.8.9 to 0.9.0 (#75)
+- *(deps)* Bump thiserror from 2.0.17 to 2.0.18 (#80)
+- *(deps)* Bump colored from 3.0.0 to 3.1.1 (#81)
 
 ### 🐛 Bug Fixes
 
 - *(dynamic-atlas)* Use atlas glyph ID for space instead of ASCII code
+- *(wasm)* Handle zero-width characters in batch.text() (#79)
+- *(dynamic-atlas)* Use dynamic batch size to prevent glyph clipping at large font sizes (#78)
+
+### ⚙️ Miscellaneous Tasks
+
+- Release beamterm 0.13.0
 
 ## [beamterm-v0.12.0] - 2026-01-08
 
