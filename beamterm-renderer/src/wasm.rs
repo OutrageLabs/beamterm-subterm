@@ -826,7 +826,7 @@ impl BeamtermRenderer {
         self.resize(w, h)
     }
 
-    /// Resize the terminal to fit new canvas dimensions
+    /// Resize the terminal to fit new canvas dimensions (CSS pixels)
     #[wasm_bindgen]
     pub fn resize(&mut self, width: i32, height: i32) -> Result<(), JsValue> {
         self.renderer.resize(width, height);
@@ -836,6 +836,54 @@ impl BeamtermRenderer {
         self.terminal_grid
             .borrow_mut()
             .resize(gl, physical_size, self.current_pixel_ratio)
+            .map_err(|e| JsValue::from_str(&format!("Failed to resize: {e}")))?;
+
+        self.update_mouse_handler_metrics();
+
+        Ok(())
+    }
+
+    /// Set the background color for canvas padding areas.
+    ///
+    /// When the canvas dimensions don't align perfectly with the terminal cell grid,
+    /// there may be unused pixels around the edges. This color fills those padding
+    /// areas. Set this to match your terminal background color.
+    ///
+    /// # Arguments
+    /// * `color` - RGB color as 24-bit integer (0xRRGGBB)
+    #[wasm_bindgen(js_name = "setCanvasPaddingColor")]
+    pub fn set_canvas_padding_color(&mut self, color: u32) {
+        let r = ((color >> 16) & 0xFF) as f32 / 255.0;
+        let g = ((color >> 8) & 0xFF) as f32 / 255.0;
+        let b = (color & 0xFF) as f32 / 255.0;
+        self.renderer.set_canvas_padding_color(r, g, b);
+    }
+
+    /// Resize the terminal using exact physical pixel dimensions.
+    ///
+    /// Use this method for precise control over canvas dimensions on HiDPI displays
+    /// to prevent padding/gaps caused by CSS-to-physical conversion rounding.
+    ///
+    /// # Arguments
+    /// * `physical_width` - Canvas width in physical (device) pixels
+    /// * `physical_height` - Canvas height in physical (device) pixels
+    /// * `css_width` - CSS width for layout (what the user sees)
+    /// * `css_height` - CSS height for layout
+    #[wasm_bindgen(js_name = "resizePhysical")]
+    pub fn resize_physical(
+        &mut self,
+        physical_width: i32,
+        physical_height: i32,
+        css_width: f64,
+        css_height: f64,
+    ) -> Result<(), JsValue> {
+        self.renderer
+            .resize_physical(physical_width, physical_height, css_width, css_height);
+
+        let gl = self.renderer.gl();
+        self.terminal_grid
+            .borrow_mut()
+            .resize(gl, (physical_width, physical_height), self.current_pixel_ratio)
             .map_err(|e| JsValue::from_str(&format!("Failed to resize: {e}")))?;
 
         self.update_mouse_handler_metrics();

@@ -13,8 +13,8 @@ Fork repozytorium [junkdog/beamterm](https://github.com/junkdog/beamterm) z popr
 
 ### Wymagania
 - Rust + wasm-pack
-- npm **Automation token** (Classic Token → Automation) - omija 2FA
-- Granular token NIE działa jeśli masz 2FA włączone
+- npm Granular token z wyłączonym 2FA (w ~/.npmrc)
+- Token jest w `~/.npmrc` - NIE commituj go do git!
 
 ### Kroki publikacji
 

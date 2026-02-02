@@ -128,6 +128,47 @@ impl Renderer {
         self.state.viewport(&self.gl, 0, 0, w, h);
     }
 
+    /// Resizes the canvas using exact physical pixel dimensions.
+    ///
+    /// Unlike [`resize`], this method accepts physical pixels directly, avoiding
+    /// CSS-to-physical conversion rounding errors. Use this for precise control
+    /// over canvas dimensions on HiDPI displays to prevent padding/gaps.
+    ///
+    /// # Parameters
+    /// * `physical_width` - Canvas width in physical (device) pixels
+    /// * `physical_height` - Canvas height in physical (device) pixels
+    /// * `css_width` - CSS width for layout (what the user sees)
+    /// * `css_height` - CSS height for layout
+    pub fn resize_physical(
+        &mut self,
+        physical_width: i32,
+        physical_height: i32,
+        css_width: f64,
+        css_height: f64,
+    ) {
+        // Store logical size based on physical / dpr for consistency
+        self.logical_size_px = (
+            (physical_width as f32 / self.pixel_ratio) as i32,
+            (physical_height as f32 / self.pixel_ratio) as i32,
+        );
+
+        // Set canvas buffer size (physical pixels)
+        self.canvas.set_width(physical_width as u32);
+        self.canvas.set_height(physical_height as u32);
+
+        // Set CSS size (for layout and mouse coordinates)
+        let _ = self
+            .canvas
+            .style()
+            .set_property("width", &format!("{css_width}px"));
+        let _ = self
+            .canvas
+            .style()
+            .set_property("height", &format!("{css_height}px"));
+
+        self.state.viewport(&self.gl, 0, 0, physical_width, physical_height);
+    }
+
     /// Clears the framebuffer with the specified color.
     ///
     /// Sets the clear color and clears both the color and depth buffers.
@@ -245,6 +286,14 @@ impl Renderer {
     /// [`crate::TerminalGrid::resize`] to update the renderer's viewport and grid dimensions.
     pub(crate) fn set_pixel_ratio(&mut self, pixel_ratio: f32) {
         self.pixel_ratio = pixel_ratio;
+    }
+
+    /// Sets the canvas padding color.
+    ///
+    /// When the canvas dimensions don't align perfectly with the terminal cell grid,
+    /// there may be unused pixels around the edges. This color fills those padding areas.
+    pub fn set_canvas_padding_color(&mut self, r: f32, g: f32, b: f32) {
+        self.canvas_padding_color = (r, g, b);
     }
 }
 
