@@ -9,7 +9,9 @@ Cargo.lock
 
 # JS/Node artifacts (kept in js/)
 /js/node_modules/
-/js/dist/
+/js/dist/cdn/
+/js/dist/web/
+/js/dist/nodejs/
 /js/test-output.png
 /js/.parcel-cache/
 /js/examples-dist/
@@ -36,8 +38,8 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Generated files
-dist/
+# Generated files (js/dist/bundler/ is committed for consumers)
+!/js/dist/bundler/
 /bitmap_font.atlas
 /data/*.atlas
 
