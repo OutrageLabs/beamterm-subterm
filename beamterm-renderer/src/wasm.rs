@@ -756,10 +756,39 @@ impl BeamtermRenderer {
         }
     }
 
-    /// Resize the terminal to fit new canvas dimensions
+    /// Resize the terminal to fit new canvas dimensions (CSS pixels)
     #[wasm_bindgen]
     pub fn resize(&mut self, width: i32, height: i32) -> Result<(), JsValue> {
         Ok(self.terminal.resize(width, height)?)
+    }
+
+    /// Resize the terminal using exact physical pixel dimensions.
+    ///
+    /// Use this method for precise control over canvas dimensions on HiDPI displays
+    /// to prevent padding/gaps caused by CSS-to-physical conversion rounding.
+    #[wasm_bindgen(js_name = "resizePhysical")]
+    pub fn resize_physical(
+        &mut self,
+        physical_width: i32,
+        physical_height: i32,
+        css_width: f64,
+        css_height: f64,
+    ) -> Result<(), JsValue> {
+        Ok(self
+            .terminal
+            .resize_physical(physical_width, physical_height, css_width, css_height)?)
+    }
+
+    /// Set the background color for canvas padding areas.
+    ///
+    /// When the canvas dimensions don't align perfectly with the terminal cell grid,
+    /// there may be unused pixels around the edges. This color fills those padding
+    /// areas. Set this to match your terminal background color.
+    ///
+    /// Color is specified as a 24-bit RGB integer (0xRRGGBB).
+    #[wasm_bindgen(js_name = "setCanvasPaddingColor")]
+    pub fn set_canvas_padding_color(&mut self, color: u32) {
+        self.terminal.set_canvas_padding_color(color);
     }
 
     /// Replace the current font atlas with a new static atlas.

@@ -173,6 +173,47 @@ impl Renderer {
         Ok(())
     }
 
+    /// Resizes the canvas using exact physical pixel dimensions.
+    ///
+    /// Unlike [`resize`], this method accepts physical pixels directly, avoiding
+    /// CSS-to-physical conversion rounding errors. Use this for precise control
+    /// over canvas dimensions on HiDPI displays to prevent padding/gaps.
+    pub fn resize_physical(
+        &mut self,
+        physical_width: i32,
+        physical_height: i32,
+        css_width: f64,
+        css_height: f64,
+    ) {
+        self.logical_size_px = (
+            (physical_width as f32 / self.pixel_ratio) as i32,
+            (physical_height as f32 / self.pixel_ratio) as i32,
+        );
+
+        self.canvas.set_width(physical_width as u32);
+        self.canvas.set_height(physical_height as u32);
+
+        let _ = self
+            .canvas
+            .style()
+            .set_property("width", &format!("{css_width}px"));
+        let _ = self
+            .canvas
+            .style()
+            .set_property("height", &format!("{css_height}px"));
+
+        self.state
+            .viewport(&self.gl, 0, 0, physical_width, physical_height);
+    }
+
+    /// Sets the canvas padding color at runtime.
+    ///
+    /// When the canvas dimensions don't align perfectly with the terminal cell grid,
+    /// there may be unused pixels around the edges. This color fills those padding areas.
+    pub fn set_canvas_padding_color(&mut self, r: f32, g: f32, b: f32) {
+        self.canvas_padding_color = (r, g, b);
+    }
+
     /// Sets the pixel ratio.
     pub(crate) fn set_pixel_ratio(&mut self, pixel_ratio: f32) {
         self.pixel_ratio = pixel_ratio;

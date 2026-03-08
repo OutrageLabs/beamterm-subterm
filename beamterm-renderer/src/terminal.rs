@@ -161,6 +161,39 @@ impl Terminal {
         Ok(())
     }
 
+    /// Resizes the terminal using exact physical pixel dimensions.
+    ///
+    /// Use this for precise control over canvas dimensions on HiDPI displays
+    /// to prevent padding/gaps caused by CSS-to-physical conversion rounding.
+    pub fn resize_physical(
+        &mut self,
+        physical_width: i32,
+        physical_height: i32,
+        css_width: f64,
+        css_height: f64,
+    ) -> Result<(), Error> {
+        self.renderer
+            .resize_physical(physical_width, physical_height, css_width, css_height);
+
+        self.grid
+            .borrow_mut()
+            .resize(self.renderer.gl(), (physical_width, physical_height), self.current_pixel_ratio)?;
+
+        self.update_mouse_handler_metrics();
+
+        Ok(())
+    }
+
+    /// Sets the canvas padding color at runtime.
+    ///
+    /// Color is specified as a 24-bit RGB integer (0xRRGGBB).
+    pub fn set_canvas_padding_color(&mut self, color: u32) {
+        let r = ((color >> 16) & 0xFF) as f32 / 255.0;
+        let g = ((color >> 8) & 0xFF) as f32 / 255.0;
+        let b = (color & 0xFF) as f32 / 255.0;
+        self.renderer.set_canvas_padding_color(r, g, b);
+    }
+
     /// Returns the terminal dimensions in cells.
     pub fn terminal_size(&self) -> (u16, u16) {
         self.grid.borrow().terminal_size()
